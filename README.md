@@ -67,9 +67,9 @@ The goal of this web app is to:
 ## 🧠 Author
 
 **Katlego Sambo**  
-Electrical Engineer • Developer • Fashion-Tech Enthusiast  
+Network Engineer • Developer • Fashion-Tech Enthusiast  
 📍 South Africa  
-📧 [contact@katlegosambo.dev] (placeholder)
+📧 [Katlego2390@gmail.com] (placeholder)
 
 ---
 
