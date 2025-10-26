@@ -1,0 +1,928 @@
+<!doctype html> 
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Learn Mode — Fashion Classroom (Expanded)</title>
+<style>
+:root{
+  --bg:#0b0b0d; --panel:#121215; --card:#17181d; --ink:#e8ebf1; --muted:#a7b0bd;
+  --accent:#10b981; --accent2:#60a5fa; --warn:#ffd166; --danger:#ff6b6b; --border:#272a31;
+}
+html[data-theme="light"]{
+  --bg:#f6f8fb; --panel:#ffffff; --card:#ffffff; --ink:#1c2430; --muted:#5c6b7a; --border:#e7ecf3;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;color:var(--ink);
+  background:radial-gradient(1400px 800px at 10% -10%,#eef8ff,transparent),
+             radial-gradient(1000px 600px at 90% 10%,#effff7,transparent),var(--bg)}
+.container{max-width:1200px;margin:32px auto;padding:0 16px}
+.header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.hgroup h1{margin:0;font-size:28px}
+.hgroup p{margin:4px 0 0;color:var(--muted)}
+.theme-toggle{border:1px solid var(--border);background:var(--panel);color:var(--ink);padding:8px 12px;border-radius:10px;cursor:pointer}
+.grid{display:grid;grid-template-columns:300px 1fr;gap:16px}
+.sidebar{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:12px;max-height:75vh;overflow:auto}
+.topic{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;cursor:pointer;border:1px solid transparent}
+.topic:hover{background:rgba(96,165,250,.08)}
+.topic.active{border-color:var(--accent2);background:rgba(96,165,250,.12)}
+.badge{margin-left:auto;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+.badge.done{border-color:var(--accent);color:var(--accent)}
+.main{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px}
+.card h2{margin-top:0}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+button{background:var(--accent);color:white;border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+button.secondary{background:transparent;color:var(--ink);border:1px solid var(--border)}
+button.ghost{background:transparent;color:var(--muted);border:0}
+.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;background:rgba(0,0,0,.06);padding:2px 6px;border-radius:6px;border:1px solid var(--border)}
+.list{line-height:1.7}
+.hr{height:1px;background:var(--border);margin:16px 0;border-radius:1px}
+.quiz-q{border:1px solid var(--border);border-radius:14px;padding:14px;margin:10px 0;background:var(--card)}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px dashed transparent;border-radius:10px;cursor:pointer}
+.opt:hover{background:rgba(16,185,129,.08)}
+.opt.selected{border-color:var(--accent)}
+.feedback{margin-top:8px;font-weight:600}
+.feedback.ok{color:var(--accent)}
+.feedback.no{color:var(--danger)}
+.progress{display:flex;gap:8px;align-items:center}
+.pill{height:8px;background:var(--border);border-radius:999px;overflow:hidden;flex:1}
+.pill>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.small{font-size:12px;color:var(--muted)}
+.color-lab,.fabric-lab,.era-lab,.culture-lab,.sustain-lab{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:12px;border:1px dashed var(--border);border-radius:14px;background:var(--card)
+}
+.swatch{width:56px;height:56px;border-radius:12px;border:1px solid var(--border)}
+label{font-size:14px;color:var(--muted)}
+select,input[type="range"]{width:220px}
+code{background:rgba(0,0,0,.06);padding:2px 6px;border-radius:6px;border:1px solid var(--border)}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;border:1px solid var(--border);padding:2px 8px;border-radius:999px;color:var(--muted)}
+.kpi{display:flex;gap:16px;flex-wrap:wrap}
+.kpi .box{border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:140px;background:var(--card)}
+kbd{background:rgba(0,0,0,.06);border:1px solid var(--border);border-radius:6px;padding:0 6px}
+footer{margin-top:8px}
+
+/* ===================== MAGAZINE ===================== */
+.magazine-hero{
+  position:relative;border-radius:16px;overflow:hidden;background:
+    radial-gradient(700px 300px at 10% -10%, rgba(96,165,250,.25), transparent),
+    radial-gradient(700px 300px at 90% 110%, rgba(16,185,129,.25), transparent),
+    linear-gradient(135deg, var(--card), var(--panel));
+  border:1px solid var(--border);padding:28px 24px;margin-bottom:8px;
+}
+.magazine-hero h2{margin:0 0 8px 0;font-size:24px}
+.magazine-hero p{margin:0;color:var(--muted)}
+.magazine-controls{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.magazine-controls input[type="search"], .magazine-controls select{
+  border:1px solid var(--border);background:var(--card);color:var(--ink);
+  padding:10px 12px;border-radius:12px;min-width:220px
+}
+.magazine-grid{
+  /* Masonry-like columns for magazine feel */
+  column-count:3; column-gap:16px;
+}
+@media (max-width:1000px){ .magazine-grid{ column-count:2; } }
+@media (max-width:640px){ .magazine-grid{ column-count:1; } }
+
+.mag-card{
+  break-inside:avoid; background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:14px; margin:0 0 16px 0; overflow:hidden;
+  display:flex; flex-direction:column; gap:10px;
+}
+.mag-cover{
+  height:160px; border-radius:12px; border:1px solid var(--border);
+  background-size:cover; background-position:center; background-repeat:no-repeat;
+}
+.mag-meta{display:flex;justify-content:space-between;align-items:center}
+.mag-title{margin:0;font-size:18px}
+.meta-small{font-size:12px;color:var(--muted)}
+.mag-tags{display:flex;gap:6px;flex-wrap:wrap}
+.mag-tags .tag{border-color:var(--border)}
+.mag-card button{align-self:flex-start}
+
+.mag-reader{
+  position:fixed; inset:0; display:none; background:rgba(0,0,0,.55);
+  z-index:60; padding:24px;
+}
+.mag-sheet{
+  max-width:900px; margin:0 auto; background:var(--panel); border:1px solid var(--border);
+  border-radius:16px; overflow:hidden; display:flex; flex-direction:column; height:100%;
+}
+.mag-head{
+  padding:16px 20px; border-bottom:1px solid var(--border); display:flex; gap:12px; align-items:center; justify-content:space-between
+}
+.mag-head .title{display:flex; flex-direction:column}
+.mag-head h3{margin:0 0 4px 0}
+.mag-head .meta-small{margin:0}
+.mag-body{
+  padding:20px; overflow:auto; flex:1; line-height:1.8
+}
+.mag-foot{
+  padding:12px 20px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; justify-content:space-between
+}
+.progressbar{height:8px;background:var(--border);border-radius:999px;overflow:hidden;flex:1;margin:0 12px}
+.progressbar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.nav-btn{background:transparent;border:1px solid var(--border);color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
+.close-btn{background:var(--danger);color:#fff;border:0}
+.hero-badge{font-size:12px;border:1px solid var(--border);padding:2px 8px;border-radius:999px;color:var(--muted)}
+/* ==================================================== */
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="hgroup">
+        <h1>🎓 Learn Mode — Fashion Classroom</h1>
+        <p class="small">Short lessons ➜ quick quizzes ➜ saved progress. New interactives included.</p>
+      </div>
+      <button class="theme-toggle" id="themeBtn" title="Toggle theme">Toggle Theme</button>
+    </div>
+
+    <div class="grid">
+      <aside class="sidebar" id="topicList" aria-label="Topics"></aside>
+
+      <main class="main">
+        <!-- Lesson -->
+        <section class="card" id="lessonCard" aria-live="polite">
+          <h2 id="lessonTitle">Pick a topic to begin</h2>
+          <div class="kpi">
+            <div class="box"><strong>Objective</strong><div id="objective" class="small"></div></div>
+            <div class="box"><strong>Time</strong><div id="timeReq" class="small"></div></div>
+            <div class="box"><strong>Key Terms</strong><div id="terms" class="small"></div></div>
+          </div>
+          <div class="hr"></div>
+          <div id="lessonBody" class="list"></div>
+          <div id="lessonExtras"></div>
+          <div class="hr"></div>
+          <div class="progress">
+            <div class="pill" aria-label="Topic completion bar"><span id="topicProgress"></span></div>
+            <span class="small" id="topicStat">0/0 complete</span>
+          </div>
+          <div class="actions">
+            <button id="startQuizBtn" disabled>Start Quiz</button>
+            <button class="secondary" id="resetTopicBtn" disabled>Reset Topic</button>
+          </div>
+        </section>
+
+        <!-- Quiz -->
+        <section class="card" id="quizCard" hidden>
+          <div class="progress" style="margin-bottom:10px">
+            <div class="pill" aria-label="Quiz progress"><span id="quizProgress"></span></div>
+            <span class="small" id="quizStat">Q1/1</span>
+          </div>
+          <h3 id="quizTitle">Quiz</h3>
+          <div id="quizBody"></div>
+          <div class="actions">
+            <button id="submitBtn">Submit</button>
+            <button class="secondary" id="nextBtn" disabled>Next</button>
+            <button class="ghost" id="quitBtn">Quit</button>
+          </div>
+        </section>
+
+        <!-- Tips -->
+        <section class="card">
+          <strong>Tips:</strong>
+          <ul class="list">
+            <li>Use <span class="kbd">R</span> to restart a topic.</li>
+            <li>Switch topics anytime—your place is saved.</li>
+            <li>Try the interactives in each lesson to make concepts “click”.</li>
+          </ul>
+        </section>
+
+        <!-- ===================== MAGAZINE AREA ===================== -->
+        <section class="card" id="magCard">
+          <div class="magazine-hero">
+            <div style="display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap">
+              <div>
+                <div class="hero-badge">New</div>
+                <h2>📰 Fashion Magazine</h2>
+                <p>Curated long-reads on color, fabrics, eras, culture, and sustainability — presented like a magazine.</p>
+              </div>
+              <div class="magazine-controls">
+                <input id="magSearch" type="search" placeholder="Search articles…">
+                <select id="magFilter">
+                  <option value="">All categories</option>
+                  <option>Color Theory</option>
+                  <option>Fabric Types</option>
+                  <option>Fashion Eras</option>
+                  <option>Cultural Attire</option>
+                  <option>Sustainable Fashion</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="magazine-grid" id="magGrid"><!-- cards injected --></div>
+        </section>
+        <!-- =================== END MAGAZINE AREA =================== -->
+
+      </main>
+    </div>
+
+    <footer class="small">Made for your Fashion Memory Game — Learn Mode (Expanded) + Magazine.</footer>
+  </div>
+
+  <!-- Reader modal -->
+  <div class="mag-reader" id="reader">
+    <div class="mag-sheet">
+      <div class="mag-head">
+        <div class="title">
+          <h3 id="rTitle">Article title</h3>
+          <div class="meta-small" id="rMeta">Category · 5 min read</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="nav-btn" id="prevBtn">← Prev</button>
+          <div class="progressbar"><span id="readProgress"></span></div>
+          <button class="nav-btn" id="nextBtn">Next →</button>
+          <button class="nav-btn close-btn" id="closeBtn">Close</button>
+        </div>
+      </div>
+      <div class="mag-body" id="rBody"></div>
+      <div class="mag-foot">
+        <div class="meta-small" id="rFootNote">Tip: Use ↑/↓ to scroll, ←/→ to navigate.</div>
+        <div class="tags" id="rTags"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   Data: Lessons + Quizzes (unchanged)
+   ========================= */
+const TOPICS = [
+  {
+    id: "color-theory",
+    title: "Color Theory",
+    objective: "Use hue relationships to build balanced outfits and accent pops.",
+    time: "6–8 min",
+    terms: ["Hue","Saturation","Value","Complement","Analogous","Triad","Monochrome"],
+    summary: "Hues, complements, triads, value/contrast & practical pairing.",
+    content: `
+      <p><strong>Core ideas:</strong> Hue (color family), Saturation (intensity), and Value (lightness/darkness). Complementary colors sit opposite on the color wheel (e.g., blue ↔ orange) for high contrast. Analogous colors (neighbors) feel harmonious. Triads (three evenly spaced hues) balance contrast and unity. Monochrome varies the <em>value</em> and <em>saturation</em> of one hue.</p>
+      <ul class="list">
+        <li><strong>Contrast for focus:</strong> Use complements for standout accessories (e.g., teal dress + coral clutch).</li>
+        <li><strong>Harmony for cohesion:</strong> Analogous schemes (forest, olive, lime) look naturally coordinated.</li>
+        <li><strong>Monochrome depth:</strong> Layer textures (matte knit + satin) to avoid flatness.</li>
+      </ul>
+      <div class="color-lab" id="colorLab">
+        <div>
+          <label for="hue">Base Hue (0–359°)</label><br/>
+          <input id="hue" type="range" min="0" max="359" value="30" />
+        </div>
+        <div>
+          <div class="swatch" id="swatch"></div>
+          <div class="small">Primary</div>
+        </div>
+        <div>
+          <div class="swatch" id="comp"></div>
+          <div class="small">Complement (180°)</div>
+        </div>
+        <div>
+          <div class="swatch" id="triad1"></div>
+          <div class="small">Triad +120°</div>
+        </div>
+        <div>
+          <div class="swatch" id="triad2"></div>
+          <div class="small">Triad −120°</div>
+        </div>
+        <div style="flex:1;min-width:240px">
+          <div class="small"><strong>Try:</strong> Drag the slider—could your “bag or shoes” be the complement while the outfit stays near the base hue?</div>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <div class="tags">
+        <span class="tag">Tip: 70/20/10 rule (base/secondary/accent)</span>
+        <span class="tag">Neutrals: black, white, grey, navy, beige</span>
+        <span class="tag">Warm vs cool undertones</span>
+      </div>
+    `,
+    quiz: [
+      { type:"mc", question:"Complementary colors are…", options:["Neighbors on the wheel","180° apart","Three evenly spaced","Same hue, diff values"], answer:1, explain:"Complements sit opposite each other (180°)." },
+      { type:"mc", question:"An analogous set is likely…", options:["Blue & Orange","Red & Green","Teal & Blue","Yellow & Purple"], answer:2, explain:"Analogous are neighbors—teal and blue are adjacent." },
+      { type:"mc", question:"A triadic scheme uses…", options:["Two colors 180° apart","Three colors evenly spaced","One hue, many values","Only neutrals"], answer:1, explain:"Triads are three hues ~120° apart." },
+      { type:"mc", question:"Monochrome outfits avoid flatness by…", options:["Adding prints only","Using texture & value shifts","Using complements only","Only bright shades"], answer:1, explain:"Texture and value variation add depth in monochrome." }
+    ]
+  },
+  {
+    id: "fabric-types",
+    title: "Fabric Types",
+    objective: "Choose fabrics by climate, drape, care, and use-case.",
+    time: "5–7 min",
+    terms: ["Breathability","Drape","Hand (feel)","Wrinkle resistance","Blend"],
+    summary: "Cotton, silk, polyester, linen — when & why to use them.",
+    content: `
+      <ul class="list">
+        <li><strong>Cotton:</strong> Breathable, absorbent, easy-care — tees, shirts, chinos.</li>
+        <li><strong>Silk:</strong> Luxe sheen, smooth drape — blouses, scarves, eveningwear.</li>
+        <li><strong>Polyester:</strong> Durable, wrinkle-resistant, quick-dry — athleisure, blends.</li>
+        <li><strong>Linen:</strong> Airy, cool, textured — summer suits, resort wear (wrinkles naturally).</li>
+      </ul>
+      <p><em>Blends:</em> Combine strengths, e.g., cotton-poly (comfort + durability), silk-cotton (sheen + breathability).</p>
+      <div class="fabric-lab" id="fabricLab">
+        <div>
+          <label for="fabricSel">Fabric Picker</label><br/>
+          <select id="fabricSel">
+            <option value="cotton">Cotton</option>
+            <option value="silk">Silk</option>
+            <option value="polyester">Polyester</option>
+            <option value="linen">Linen</option>
+          </select>
+        </div>
+        <div class="box" style="border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:240px;background:var(--card)">
+          <div><strong id="fabName">Cotton</strong></div>
+          <div class="small" id="fabDesc">Breathable everyday staple.</div>
+          <div class="hr"></div>
+          <div class="small"><strong>Feel:</strong> <span id="fabFeel">Soft, matte</span></div>
+          <div class="small"><strong>Best for:</strong> <span id="fabBest">Tees, shirts</span></div>
+          <div class="small"><strong>Care:</strong> <span id="fabCare">Machine wash warm, tumble low</span></div>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <div class="tags">
+        <span class="tag">Hot & humid → Linen/Cotton</span>
+        <span class="tag">Wrinkle-resistant → Polyester blends</span>
+        <span class="tag">Occasion wear → Silk</span>
+      </div>
+    `,
+    quiz: [
+      { type:"mc", question:"Best in humid summer?", options:["Polyester","Linen","Velvet","Wool"], answer:1, explain:"Linen’s airy weave keeps you cool." },
+      { type:"mc", question:"Silk is known for…", options:["Bulk","Lustre & drape","Stretch like spandex","Fleece texture"], answer:1, explain:"Silk has a natural sheen and fluid drape." },
+      { type:"mc", question:"A travel-friendly property is…", options:["Wrinkles easily","Heavy and hot","Wrinkle resistance","Requires dry ice"], answer:2, explain:"Wrinkle resistance = easier travel wear." },
+      { type:"mc", question:"A cotton-poly blend usually aims to…", options:["Reduce durability","Increase wrinkling","Combine strengths","Lower breathability only"], answer:2, explain:"Blends combine benefits (durability, comfort, care)." }
+    ]
+  },
+  {
+    id: "fashion-eras",
+    title: "Fashion Eras",
+    objective: "Identify era signatures and mix them tastefully with modern basics.",
+    time: "6–8 min",
+    terms: ["Silhouette","Motif","Proportion","Era reference","Power dressing"],
+    summary: "1920s flapper, 1980s glam, 2020s streetwear—what defines each.",
+    content: `
+      <ul class="list">
+        <li><strong>1920s — Flapper:</strong> Drop waists, fringe, beading, cloche hats.</li>
+        <li><strong>1980s — Glam:</strong> Power suits, strong shoulders, metallics, neon.</li>
+        <li><strong>2020s — Streetwear:</strong> Oversized cuts, athleisure, sneakers, tech fabrics.</li>
+      </ul>
+      <p><em>Modern mix:</em> Use one strong era reference (e.g., 80s blazer) with today’s staples to avoid looking like a costume.</p>
+      <div class="era-lab" id="eraLab">
+        <div>
+          <label for="eraRange">Era Slider</label><br/>
+          <input id="eraRange" type="range" min="1920" max="2020" step="60" value="1920" />
+        </div>
+        <div class="box" style="border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:260px;background:var(--card)">
+          <div><strong id="eraName">1920s — Flapper</strong></div>
+          <div class="small" id="eraKeys">Drop waists, fringe, beading</div>
+          <div class="hr"></div>
+          <div class="small"><strong>Try this:</strong> <span id="eraTip">Beaded clutch with a modern slip dress.</span></div>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <div class="tags">
+        <span class="tag">1 era piece at a time</span>
+        <span class="tag">Balance proportions</span>
+        <span class="tag">Neutral base + era accent</span>
+      </div>
+    `,
+    quiz: [
+      { type:"mc", question:"1920s silhouettes favored…", options:["Drop waists","Shoulder pads","Bell-bottoms","Cargos"], answer:0, explain:"Drop-waist dresses define flapper style." },
+      { type:"mc", question:"Strong shoulders + metallics point to…", options:["1960s Mod","1980s Glam","1990s Grunge","1970s Boho"], answer:1, explain:"Iconic 80s power dressing cues." },
+      { type:"mc", question:"To avoid a costume feel…", options:["Layer many era pieces","Use 1 era accent with basics","Neon everything","Ignore proportions"], answer:1, explain:"Anchor with modern staples." },
+      { type:"mc", question:"Streetwear hallmarks include…", options:["Oversized fits & sneakers","Crinolines & corsets","Powdered wigs","Bustles"], answer:0, explain:"2020s streetwear = relaxed cuts + sneakers." }
+    ]
+  },
+  {
+    id: "cultural-attire",
+    title: "Cultural Attire",
+    objective: "Incorporate global influences respectfully and context-aware.",
+    time: "5–7 min",
+    terms: ["Cultural context","Appropriation","Regalia","Motif","Artisan craft"],
+    summary: "Global dress influences & respectful styling practices.",
+    content: `
+      <p>Fashion draws from rich global traditions: <strong>African</strong> prints (e.g., Ankara, Shweshwe), <strong>Asian</strong> silhouettes (cheongsam, sari), <strong>European</strong> tailoring (Savile Row), and more. Understand meanings and context before styling.</p>
+      <ul class="list">
+        <li><strong>Do:</strong> Learn the story, support artisans, credit the source.</li>
+        <li><strong>Don’t:</strong> Use sacred/regalia elements as casual fashion or strip symbols of meaning.</li>
+      </ul>
+      <div class="culture-lab">
+        <div class="box" style="border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:260px;background:var(--card)">
+          <div><strong>Quick Do/Don’t</strong></div>
+          <div class="small">✅ Ask: “Is this ceremonial? Who made it? Am I crediting/compensating creators?”</div>
+          <div class="small">🚫 Avoid: sacred headdresses, funerary cloths, or clan-specific regalia for style.</div>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <div class="tags">
+        <span class="tag">Context first</span>
+        <span class="tag">Buy from creators</span>
+        <span class="tag">Credit sources</span>
+      </div>
+    `,
+    quiz: [
+      { type:"mc", question:"Best practice when styling cultural attire…", options:["Ignore context","Use sacred items casually","Learn meanings & show respect","Claim invention"], answer:2, explain:"Context and respect reduce harm." },
+      { type:"mc", question:"Ankara and Shweshwe are associated with…", options:["South America","Africa","Oceania","Northern Europe"], answer:1, explain:"Common African textiles." },
+      { type:"mc", question:"A respectful action is to…", options:["Remove cultural meaning","Credit and compensate artisans","Trademark motifs","Wear regalia to the club"], answer:1, explain:"Credit + compensation supports communities." },
+      { type:"mc", question:"Regalia usually refers to…", options:["Casual motifs","Ceremonial/sacred items","Streetwear logos","Random patterns"], answer:1, explain:"Regalia are often ceremonial, not casual fashion." }
+    ]
+  },
+  {
+    id: "sustainable-fashion",
+    title: "Sustainable Fashion",
+    objective: "Lower impact via materials, care, repair, and re-wearing.",
+    time: "5–7 min",
+    terms: ["Lifecycle","Embodied energy","Microfibers","Circularity","Second-hand"],
+    summary: "Planet-aligned choices: material, care, longevity, and reuse.",
+    content: `
+      <ul class="list">
+        <li><strong>Materials:</strong> Organic cotton, recycled polyester, linen, Tencel/lyocell.</li>
+        <li><strong>Care:</strong> Wash cold, line dry, mend small tears, re-dye to refresh.</li>
+        <li><strong>Buy smart:</strong> Choose timeless items you’ll wear 30+ times; consider second-hand.</li>
+      </ul>
+      <div class="sustain-lab" id="sustainLab">
+        <div>
+          <label for="wears">Estimated Wears (5–100)</label><br/>
+          <input id="wears" type="range" min="5" max="100" step="5" value="30" />
+        </div>
+        <div class="box" style="border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:260px;background:var(--card)">
+          <div><strong>Per-Wear Impact Estimate</strong></div>
+          <div class="small">Assuming fixed production footprint split across wears.</div>
+          <div class="hr"></div>
+          <div class="small"><strong>Wears:</strong> <span id="wearsVal">30</span></div>
+          <div class="small"><strong>Relative Impact vs 10 wears:</strong> <span id="impactVal">33%</span></div>
+          <div class="small"><em>Hint:</em> More wears = lower impact per wear.</div>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <div class="tags">
+        <span class="tag">Care to extend life</span>
+        <span class="tag">Repair > Replace</span>
+        <span class="tag">Second-hand & swap</span>
+      </div>
+    `,
+    quiz: [
+      { type:"mc", question:"A strong sustainable habit is…", options:["Impulse buying","Cold wash & line dry","Discard after 5 wears","Dry clean only"], answer:1, explain:"Lower energy + longer life." },
+      { type:"mc", question:"A lower-impact fiber option is…", options:["Virgin polyester","PVC vinyl","Organic cotton","Foam-laminated nylon"], answer:2, explain:"Organic cotton avoids many pesticides; still consider water use." },
+      { type:"mc", question:"Per-wear impact generally … as wears increase.", options:["Stays the same","Increases","Decreases","Becomes zero"], answer:2, explain:"Fixed production impact divided by more wears." },
+      { type:"mc", question:"A circular action is…", options:["Landfill","Incinerate","Repair/Resell","Overproduce"], answer:2, explain:"Keeping items in use longer closes the loop." }
+    ]
+  }
+];
+
+/* =========================
+   Progress
+   ========================= */
+const STORAGE_KEY = "learnProgress.v2";
+const progress = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+/* =========================
+   DOM Refs
+   ========================= */
+const els = {
+  topicList: document.getElementById("topicList"),
+  lessonCard: document.getElementById("lessonCard"),
+  lessonTitle: document.getElementById("lessonTitle"),
+  lessonBody: document.getElementById("lessonBody"),
+  lessonExtras: document.getElementById("lessonExtras"),
+  topicProgress: document.getElementById("topicProgress"),
+  topicStat: document.getElementById("topicStat"),
+  startQuizBtn: document.getElementById("startQuizBtn"),
+  resetTopicBtn: document.getElementById("resetTopicBtn"),
+  quizCard: document.getElementById("quizCard"),
+  quizProgress: document.getElementById("quizProgress"),
+  quizStat: document.getElementById("quizStat"),
+  quizTitle: document.getElementById("quizTitle"),
+  quizBody: document.getElementById("quizBody"),
+  submitBtn: document.getElementById("submitBtn"),
+  nextBtn: document.getElementById("nextBtn"),
+  quitBtn: document.getElementById("quitBtn"),
+  themeBtn: document.getElementById("themeBtn"),
+  objective: document.getElementById("objective"),
+  timeReq: document.getElementById("timeReq"),
+  terms: document.getElementById("terms"),
+
+  /* Magazine */
+  magGrid: document.getElementById("magGrid"),
+  magSearch: document.getElementById("magSearch"),
+  magFilter: document.getElementById("magFilter"),
+  reader: document.getElementById("reader"),
+  rTitle: document.getElementById("rTitle"),
+  rMeta: document.getElementById("rMeta"),
+  rBody: document.getElementById("rBody"),
+  rTags: document.getElementById("rTags"),
+  readProgress: document.getElementById("readProgress"),
+  prevBtn: document.getElementById("prevBtn"),
+  nextBtn: document.getElementById("nextBtn"),
+  closeBtn: document.getElementById("closeBtn")
+};
+
+let activeTopic = null;
+let currentQ = 0;
+let selected = null;
+
+/* =========================
+   Helpers
+   ========================= */
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+function ensureTopicState(id){ if(!progress[id]) progress[id] = {completed:false,quizIndex:0,score:0,answered:0}; }
+function setActive(topicId){
+  activeTopic = TOPICS.find(t=>t.id===topicId);
+  ensureTopicState(topicId);
+  renderLesson();
+  highlightSidebar();
+}
+function highlightSidebar(){
+  [...els.topicList.querySelectorAll(".topic")].forEach(node=>{
+    node.classList.toggle("active", node.dataset.id===activeTopic?.id);
+  });
+}
+function percentage(n,d){ return d ? Math.round((n/d)*100) : 0; }
+function chips(list){ return list.map(t=>`<span class="tag">${t}</span>`).join(" "); }
+
+/* =========================
+   Sidebar
+   ========================= */
+function renderSidebar(){
+  els.topicList.innerHTML = "";
+  TOPICS.forEach(t=>{
+    ensureTopicState(t.id);
+    const row = document.createElement("div");
+    row.className = "topic";
+    row.dataset.id = t.id;
+    row.innerHTML = `
+      <span>📘</span>
+      <div>
+        <div><strong>${t.title}</strong></div>
+        <div class="small">${t.summary}</div>
+      </div>
+      <span class="badge ${progress[t.id].completed?'done':''}">${progress[t.id].completed?'Done':'New'}</span>
+    `;
+    row.addEventListener("click", ()=>setActive(t.id));
+    els.topicList.appendChild(row);
+  });
+}
+
+/* =========================
+   Lesson + Interactives
+   ========================= */
+function renderLesson(){
+  if(!activeTopic) return;
+  els.lessonTitle.textContent = activeTopic.title;
+  els.objective.textContent = activeTopic.objective || "—";
+  els.timeReq.textContent = activeTopic.time || "—";
+  els.terms.innerHTML = chips(activeTopic.terms || []);
+  els.lessonBody.innerHTML = activeTopic.content;
+  els.lessonExtras.innerHTML = "";
+
+  // Interactives
+  if(activeTopic.id==="color-theory"){
+    const hue = document.getElementById("hue");
+    const swatch = document.getElementById("swatch");
+    const comp = document.getElementById("comp");
+    const t1 = document.getElementById("triad1");
+    const t2 = document.getElementById("triad2");
+    const set = ()=>{
+      const h = Number(hue.value);
+      swatch.style.background = `hsl(${h} 80% 50%)`;
+      comp.style.background   = `hsl(${(h+180)%360} 80% 50%)`;
+      t1.style.background     = `hsl(${(h+120)%360} 80% 50%)`;
+      t2.style.background     = `hsl(${(h+240)%360} 80% 50%)`;
+    };
+    hue.addEventListener("input", set); set();
+  }
+  if(activeTopic.id==="fabric-types"){
+    const DB = {
+      cotton: {name:"Cotton",desc:"Breathable everyday staple.",feel:"Soft, matte",best:"Tees, shirts, chinos",care:"Machine wash warm, tumble low"},
+      silk: {name:"Silk",desc:"Lustrous with fluid drape.",feel:"Smooth, cool hand",best:"Blouses, scarves, evening",care:"Delicate wash or dry clean"},
+      polyester: {name:"Polyester",desc:"Durable, quick-dry.",feel:"Smooth, sometimes crisp",best:"Athleisure, blends",care:"Machine wash cold, quick dry"},
+      linen: {name:"Linen",desc:"Cool, airy, textured.",feel:"Crisp, slubby",best:"Summer suits, shirts",care:"Gentle wash, line dry, embrace wrinkles"}
+    };
+    const sel = document.getElementById("fabricSel");
+    const name = document.getElementById("fabName");
+    const desc = document.getElementById("fabDesc");
+    const feel = document.getElementById("fabFeel");
+    const best = document.getElementById("fabBest");
+    const care = document.getElementById("fabCare");
+    const set = ()=>{
+      const f = DB[sel.value];
+      name.textContent = f.name; desc.textContent = f.desc; feel.textContent = f.feel; best.textContent = f.best; care.textContent = f.care;
+    };
+    sel.addEventListener("change", set); set();
+  }
+  if(activeTopic.id==="fashion-eras"){
+    const MAP = {
+      1920:{name:"1920s — Flapper",keys:"Drop waists, fringe, beading",tip:"Beaded clutch with a modern slip dress."},
+      1980:{name:"1980s — Glam",keys:"Power shoulders, metallics, neon",tip:"Strong-shoulder blazer over a plain tee + jeans."},
+      2020:{name:"2020s — Streetwear",keys:"Oversized cuts, sneakers, tech fabrics",tip:"Oversized hoodie with tailored trousers for contrast."}
+    };
+    const r = document.getElementById("eraRange");
+    const en = document.getElementById("eraName");
+    const ek = document.getElementById("eraKeys");
+    const et = document.getElementById("eraTip");
+    const set = ()=>{
+      const snap = r.value<1960?1920:(r.value<1990?1980:2020);
+      const e = MAP[snap];
+      en.textContent = e.name; ek.textContent = e.keys; et.textContent = e.tip;
+    };
+    r.addEventListener("input", set); set();
+  }
+  if(activeTopic.id==="sustainable-fashion"){
+    const wears = document.getElementById("wears");
+    const wearsVal = document.getElementById("wearsVal");
+    const impactVal = document.getElementById("impactVal");
+    const set = ()=>{
+      const w = Number(wears.value);
+      wearsVal.textContent = w;
+      const rel = (10/w*100).toFixed(0)+"%";
+      impactVal.textContent = rel;
+    };
+    wears.addEventListener("input", set); set();
+  }
+
+  const st = progress[activeTopic.id];
+  const answered = st.answered;
+  const total = activeTopic.quiz.length;
+  els.topicProgress.style.width = `${percentage(answered,total)}%`;
+  els.topicStat.textContent = `${answered}/${total} complete`;
+
+  els.startQuizBtn.disabled = false;
+  els.resetTopicBtn.disabled = false;
+  els.quizCard.hidden = true;
+}
+
+/* =========================
+   Quiz Flow
+   ========================= */
+function startQuiz(){
+  currentQ = progress[activeTopic.id].quizIndex || 0;
+  selected = null;
+  renderQuestion();
+  els.quizCard.hidden = false;
+  // Note: "Next" is enabled after Submit on non-final questions.
+}
+function renderQuestion(){
+  const q = activeTopic.quiz[currentQ];
+  els.quizTitle.textContent = `${activeTopic.title} — Quiz`;
+  els.quizBody.innerHTML = `
+    <div class="quiz-q">
+      <div><strong>Q${currentQ+1}.</strong> ${q.question}</div>
+      <div style="margin-top:8px" id="opts"></div>
+      <div id="feedback" class="feedback"></div>
+    </div>
+  `;
+  const opts = document.getElementById("opts");
+  q.options.forEach((opt,i)=>{
+    const btn = document.createElement("div");
+    btn.className = "opt";
+    btn.innerHTML = `<input type="radio" name="ans" style="margin-top:3px" /> <div>${opt}</div>`;
+    btn.addEventListener("click", ()=>{
+      selected = i;
+      [...opts.children].forEach(c=>c.classList.remove("selected"));
+      btn.classList.add("selected");
+      els.submitBtn.disabled = false;
+    });
+    opts.appendChild(btn);
+  });
+  els.submitBtn.disabled = selected===null;
+  document.getElementById("nextBtn").disabled = true;
+  els.quizProgress.style.width = `${percentage(currentQ, activeTopic.quiz.length)}%`;
+  els.quizStat.textContent = `Q${currentQ+1}/${activeTopic.quiz.length}`;
+}
+document.getElementById("submitBtn").addEventListener("click", ()=>{
+  const q = activeTopic.quiz[currentQ];
+  const correct = selected === q.answer;
+  const fb = document.getElementById("feedback");
+  fb.textContent = correct ? `Correct! ${q.explain||""}` : `Not quite. ${q.explain||""}`;
+  fb.className = `feedback ${correct?'ok':'no'}`;
+
+  const st = progress[activeTopic.id];
+  if (st.quizIndex === currentQ){
+    st.answered = Math.max(st.answered, currentQ+1);
+    if (correct) st.score = (st.score||0) + 1;
+    st.quizIndex = currentQ + 1;
+    if (st.answered >= activeTopic.quiz.length) st.completed = true;
+    save();
+  }
+  document.getElementById("nextBtn").disabled = (currentQ >= activeTopic.quiz.length-1);
+
+  const total = activeTopic.quiz.length;
+  els.topicProgress.style.width = `${percentage(st.answered,total)}%`;
+  els.topicStat.textContent = `${st.answered}/${total} complete`;
+
+  if(currentQ >= activeTopic.quiz.length-1){
+    const totalScore = progress[activeTopic.id].score;
+    setTimeout(()=>{
+      els.quizBody.insertAdjacentHTML("beforeend", `
+        <div class="hr"></div>
+        <div><strong>Completed!</strong> Score: ${totalScore}/${activeTopic.quiz.length}</div>
+        <div class="actions" style="margin-top:8px">
+          <button class="secondary" id="reviewBtn">Review Topic</button>
+          <button id="retryBtn">Retry Quiz</button>
+        </div>
+      `);
+      document.getElementById("reviewBtn").onclick = ()=>{ els.quizCard.hidden = true; renderLesson(); };
+      document.getElementById("retryBtn").onclick = ()=> resetTopic(activeTopic.id, true);
+      renderSidebar();
+    }, 200);
+  }
+});
+document.getElementById("nextBtn").addEventListener("click", ()=>{
+  if(currentQ < activeTopic.quiz.length-1){
+    currentQ++; selected=null; renderQuestion();
+  }
+});
+document.getElementById("quitBtn").addEventListener("click", ()=> els.quizCard.hidden = true);
+
+/* =========================
+   Reset Topic
+   ========================= */
+function resetTopic(id, autoStart=false){
+  progress[id] = {completed:false,quizIndex:0,score:0,answered:0};
+  save();
+  if(activeTopic?.id===id){ renderLesson(); renderSidebar(); if(autoStart) startQuiz(); }
+}
+
+/* =========================
+   Theme & Hotkeys
+   ========================= */
+els.themeBtn.addEventListener("click", ()=>{
+  const html = document.documentElement;
+  html.setAttribute("data-theme", html.getAttribute("data-theme")==="light" ? "dark" : "light");
+});
+document.addEventListener("keydown",(e)=>{
+  if(e.key.toLowerCase()==="r" && activeTopic) resetTopic(activeTopic.id,false);
+});
+
+/* =========================
+   MAGAZINE: Data
+   ========================= */
+const ARTICLES = [
+  {
+    id:"a1",
+    title:"Mastering the 70/20/10 Palette",
+    category:"Color Theory",
+    minutes:5,
+    tags:["Contrast","Accents","Neutrals"],
+    cover:"linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)",
+    html:`
+      <p>The 70/20/10 rule keeps outfits balanced: 70% base, 20% secondary, 10% accent. Choose a neutral base (navy, beige, grey), a supporting color that’s adjacent on the wheel, then punctuate with a complementary accent for pop.</p>
+      <h4>How to apply</h4>
+      <ul>
+        <li>Base: Navy suit</li>
+        <li>Secondary: Light blue shirt</li>
+        <li>Accent: Coral pocket square (navy’s complement is in the orange family)</li>
+      </ul>
+      <p>Texture can be a “soft accent”: matte vs satin adds depth without new color.</p>
+    `
+  },
+  {
+    id:"a2",
+    title:"Cotton vs Linen in Summer",
+    category:"Fabric Types",
+    minutes:6,
+    tags:["Breathability","Heat","Care"],
+    cover:"linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%)",
+    html:`
+      <p>Both cotton and linen breathe well, but linen’s looser weave moves air better. Cotton wins on softness and wrinkle resistance; linen wins on coolness and texture.</p>
+      <h4>Quick picks</h4>
+      <ul>
+        <li><strong>City heat:</strong> Cotton-linen blend shirt for softness + airflow.</li>
+        <li><strong>Beach:</strong> Pure linen, embrace the wrinkles.</li>
+        <li><strong>Travel:</strong> Cotton-blend chinos to avoid creases.</li>
+      </ul>
+    `
+  },
+  {
+    id:"a3",
+    title:"A Modern Take on 1980s Glam",
+    category:"Fashion Eras",
+    minutes:7,
+    tags:["Power shoulders","Metallics","Balance"],
+    cover:"linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
+    html:`
+      <p>Borrow the confidence of ‘80s glam without the costume. Keep one hero piece — a strong-shoulder blazer — and mute the rest with modern basics.</p>
+      <ol>
+        <li>Pick a blazer with structure.</li>
+        <li>Pair with plain tee + straight jeans.</li>
+        <li>Metallic accent: belt or micro-bag.</li>
+      </ol>
+      <p>Proportion is key: one oversized item at a time.</p>
+    `
+  },
+  {
+    id:"a4",
+    title:"Respectful Styling with Ankara & Shweshwe",
+    category:"Cultural Attire",
+    minutes:6,
+    tags:["Context","Artisans","Attribution"],
+    cover:"linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+    html:`
+      <p>Ankara and Shweshwe carry cultural stories. Buy from makers, learn meanings, and avoid ceremonial patterns for casual wear.</p>
+      <p>Credit designers in captions and product pages; visibility sustains heritage.</p>
+    `
+  },
+  {
+    id:"a5",
+    title:"Wear It 30+ Times: The Real Sustainability Hack",
+    category:"Sustainable Fashion",
+    minutes:4,
+    tags:["Longevity","Care","Repair"],
+    cover:"linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)",
+    html:`
+      <p>Most impact is “front-loaded” at production. Stretch it over 30+ wears: wash cold, line dry, repair seams, and rotate pairs.</p>
+      <p>Set a personal rule: no purchase unless you can picture five outfits.</p>
+    `
+  },
+  {
+    id:"a6",
+    title:"Triads for Dynamic Outfits",
+    category:"Color Theory",
+    minutes:5,
+    tags:["Triad","Energy","Balance"],
+    cover:"linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)",
+    html:`
+      <p>Triads (three hues ~120° apart) create energetic palettes. Keep saturation moderate to prevent clashes and let one hue lead.</p>
+      <p>Example: Teal jacket, marigold tee, raspberry sneaker detail.</p>
+    `
+  }
+];
+
+/* =========================
+   MAGAZINE: Render & Interactions
+   ========================= */
+let viewIndex = 0;       // index within filtered list
+let filtered = ARTICLES; // current filter result
+
+function renderMagCards(list){
+  els.magGrid.innerHTML = "";
+  list.forEach((a,i)=>{
+    const card = document.createElement("article");
+    card.className = "mag-card";
+    card.innerHTML = `
+      <div class="mag-cover" style="background:${a.cover}"></div>
+      <div class="mag-meta">
+        <span class="meta-small">${a.category}</span>
+        <span class="meta-small">~${a.minutes} min</span>
+      </div>
+      <h3 class="mag-title">${a.title}</h3>
+      <div class="mag-tags">${a.tags.map(t=>`<span class="tag">${t}</span>`).join(" ")}</div>
+      <button data-id="${a.id}">Read</button>
+    `;
+    card.querySelector("button").addEventListener("click", ()=>openReaderById(a.id));
+    els.magGrid.appendChild(card);
+  });
+}
+function applyFilter(){
+  const q = (els.magSearch.value||"").toLowerCase().trim();
+  const f = els.magFilter.value;
+  filtered = ARTICLES.filter(a=>{
+    const catOk = !f || a.category===f;
+    const text = (a.title+" "+a.category+" "+a.tags.join(" ")).toLowerCase();
+    const qOk = !q || text.includes(q);
+    return catOk && qOk;
+  });
+  renderMagCards(filtered);
+}
+function openReaderById(id){
+  const idx = filtered.findIndex(a=>a.id===id);
+  if(idx<0) return;
+  viewIndex = idx;
+  openReaderAt(viewIndex);
+}
+function openReaderAt(i){
+  const a = filtered[i];
+  if(!a) return;
+  els.rTitle.textContent = a.title;
+  els.rMeta.textContent  = `${a.category} · ${a.minutes} min read`;
+  els.rBody.innerHTML    = a.html;
+  els.rTags.innerHTML    = a.tags.map(t=>`<span class="tag">${t}</span>`).join(" ");
+  els.readProgress.style.width = `${((i+1)/filtered.length*100).toFixed(0)}%`;
+  els.reader.style.display = "block";
+}
+function closeReader(){ els.reader.style.display = "none"; }
+function nextArticle(){ if(viewIndex < filtered.length-1){ viewIndex++; openReaderAt(viewIndex); } }
+function prevArticle(){ if(viewIndex > 0){ viewIndex--; openReaderAt(viewIndex); } }
+
+els.magSearch.addEventListener("input", applyFilter);
+els.magFilter.addEventListener("change", applyFilter);
+els.closeBtn.addEventListener("click", closeReader);
+els.nextBtn.addEventListener("click", nextArticle);
+els.prevBtn.addEventListener("click", prevArticle);
+document.addEventListener("keydown", (e)=>{
+  if(els.reader.style.display==="block"){
+    if(e.key==="ArrowRight") nextArticle();
+    if(e.key==="ArrowLeft") prevArticle();
+    if(e.key==="Escape") closeReader();
+  }
+});
+
+/* =========================
+   Init
+   ========================= */
+renderSidebar();
+setActive(TOPICS[0].id);      // default topic
+applyFilter();                // render magazine
+
+</script>
+</body>
+</html>
