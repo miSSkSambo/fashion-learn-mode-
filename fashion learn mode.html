@@ -78,10 +78,7 @@ footer{margin-top:8px}
   border:1px solid var(--border);background:var(--card);color:var(--ink);
   padding:10px 12px;border-radius:12px;min-width:220px
 }
-.magazine-grid{
-  /* Masonry-like columns for magazine feel */
-  column-count:3; column-gap:16px;
-}
+.magazine-grid{column-count:3; column-gap:16px;}
 @media (max-width:1000px){ .magazine-grid{ column-count:2; } }
 @media (max-width:640px){ .magazine-grid{ column-count:1; } }
 
@@ -175,7 +172,7 @@ footer{margin-top:8px}
           <div id="quizBody"></div>
           <div class="actions">
             <button id="submitBtn">Submit</button>
-            <button class="secondary" id="nextBtn" disabled>Next</button>
+            <button class="secondary" id="quizNextBtn" disabled>Next</button>
             <button class="ghost" id="quitBtn">Quit</button>
           </div>
         </section>
@@ -232,10 +229,10 @@ footer{margin-top:8px}
           <div class="meta-small" id="rMeta">Category · 5 min read</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="nav-btn" id="prevBtn">← Prev</button>
+          <button class="nav-btn" id="readerPrevBtn">← Prev</button>
           <div class="progressbar"><span id="readProgress"></span></div>
-          <button class="nav-btn" id="nextBtn">Next →</button>
-          <button class="nav-btn close-btn" id="closeBtn">Close</button>
+          <button class="nav-btn" id="readerNextBtn">Next →</button>
+          <button class="nav-btn close-btn" id="readerCloseBtn">Close</button>
         </div>
       </div>
       <div class="mag-body" id="rBody"></div>
@@ -248,7 +245,7 @@ footer{margin-top:8px}
 
 <script>
 /* =========================
-   Data: Lessons + Quizzes (unchanged)
+   Data: Lessons + Quizzes
    ========================= */
 const TOPICS = [
   {
@@ -494,7 +491,7 @@ const els = {
   quizTitle: document.getElementById("quizTitle"),
   quizBody: document.getElementById("quizBody"),
   submitBtn: document.getElementById("submitBtn"),
-  nextBtn: document.getElementById("nextBtn"),
+  quizNextBtn: document.getElementById("quizNextBtn"),
   quitBtn: document.getElementById("quitBtn"),
   themeBtn: document.getElementById("themeBtn"),
   objective: document.getElementById("objective"),
@@ -511,9 +508,9 @@ const els = {
   rBody: document.getElementById("rBody"),
   rTags: document.getElementById("rTags"),
   readProgress: document.getElementById("readProgress"),
-  prevBtn: document.getElementById("prevBtn"),
-  nextBtn: document.getElementById("nextBtn"),
-  closeBtn: document.getElementById("closeBtn")
+  readerPrevBtn: document.getElementById("readerPrevBtn"),
+  readerNextBtn: document.getElementById("readerNextBtn"),
+  readerCloseBtn: document.getElementById("readerCloseBtn")
 };
 
 let activeTopic = null;
@@ -658,7 +655,6 @@ function startQuiz(){
   selected = null;
   renderQuestion();
   els.quizCard.hidden = false;
-  // Note: "Next" is enabled after Submit on non-final questions.
 }
 function renderQuestion(){
   const q = activeTopic.quiz[currentQ];
@@ -683,12 +679,13 @@ function renderQuestion(){
     });
     opts.appendChild(btn);
   });
-  els.submitBtn.disabled = selected===null;
-  document.getElementById("nextBtn").disabled = true;
+  els.submitBtn.disabled = (selected===null);
+  els.quizNextBtn.disabled = true;
   els.quizProgress.style.width = `${percentage(currentQ, activeTopic.quiz.length)}%`;
   els.quizStat.textContent = `Q${currentQ+1}/${activeTopic.quiz.length}`;
 }
-document.getElementById("submitBtn").addEventListener("click", ()=>{
+
+els.submitBtn.addEventListener("click", ()=>{
   const q = activeTopic.quiz[currentQ];
   const correct = selected === q.answer;
   const fb = document.getElementById("feedback");
@@ -703,7 +700,7 @@ document.getElementById("submitBtn").addEventListener("click", ()=>{
     if (st.answered >= activeTopic.quiz.length) st.completed = true;
     save();
   }
-  document.getElementById("nextBtn").disabled = (currentQ >= activeTopic.quiz.length-1);
+  els.quizNextBtn.disabled = (currentQ >= activeTopic.quiz.length-1);
 
   const total = activeTopic.quiz.length;
   els.topicProgress.style.width = `${percentage(st.answered,total)}%`;
@@ -726,12 +723,13 @@ document.getElementById("submitBtn").addEventListener("click", ()=>{
     }, 200);
   }
 });
-document.getElementById("nextBtn").addEventListener("click", ()=>{
+
+els.quizNextBtn.addEventListener("click", ()=>{
   if(currentQ < activeTopic.quiz.length-1){
     currentQ++; selected=null; renderQuestion();
   }
 });
-document.getElementById("quitBtn").addEventListener("click", ()=> els.quizCard.hidden = true);
+els.quitBtn.addEventListener("click", ()=> els.quizCard.hidden = true);
 
 /* =========================
    Reset Topic
@@ -741,6 +739,10 @@ function resetTopic(id, autoStart=false){
   save();
   if(activeTopic?.id===id){ renderLesson(); renderSidebar(); if(autoStart) startQuiz(); }
 }
+
+/* Hook up Lesson actions */
+els.startQuizBtn.addEventListener("click", startQuiz);
+els.resetTopicBtn.addEventListener("click", ()=> resetTopic(activeTopic.id,false));
 
 /* =========================
    Theme & Hotkeys
@@ -905,9 +907,9 @@ function prevArticle(){ if(viewIndex > 0){ viewIndex--; openReaderAt(viewIndex);
 
 els.magSearch.addEventListener("input", applyFilter);
 els.magFilter.addEventListener("change", applyFilter);
-els.closeBtn.addEventListener("click", closeReader);
-els.nextBtn.addEventListener("click", nextArticle);
-els.prevBtn.addEventListener("click", prevArticle);
+els.readerCloseBtn.addEventListener("click", closeReader);
+els.readerNextBtn.addEventListener("click", nextArticle);
+els.readerPrevBtn.addEventListener("click", prevArticle);
 document.addEventListener("keydown", (e)=>{
   if(els.reader.style.display==="block"){
     if(e.key==="ArrowRight") nextArticle();
@@ -919,9 +921,12 @@ document.addEventListener("keydown", (e)=>{
 /* =========================
    Init
    ========================= */
-renderSidebar();
-setActive(TOPICS[0].id);      // default topic
-applyFilter();                // render magazine
+function init(){
+  renderSidebar();
+  setActive(TOPICS[0].id);   // default topic
+  applyFilter();             // render magazine
+}
+init();
 
 </script>
 </body>
